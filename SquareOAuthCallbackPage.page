@@ -1,0 +1,32 @@
+<apex:page controller="SquareOAuthController">
+    <h2>Handling Square OAuth Callback...</h2>
+    <pre id="resultBox">Processing...</pre>
+    <script>
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        window.onload = function() {
+            const authCode = getQueryParam("code");
+            const resultBox = document.getElementById("resultBox");
+
+            if (!authCode) {
+                resultBox.innerText = "No authorization code found in URL.";
+                return;
+            }
+
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.SquareOAuthController.doOAuthCallback}', 
+                authCode,
+                function(result, event){
+                    if (event.status) {
+                        resultBox.innerText = result;
+                    } else {
+                        resultBox.innerText = "Error in OAuth callback processing.";
+                    }
+                }
+            );
+        };
+    </script>
+</apex:page>
